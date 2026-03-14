@@ -1,0 +1,3 @@
+# erros que podem ocorrer na camada de domínio, como erros de validação, erros de negócio ou erros relacionados a regras específicas do domínio.
+# a resolução dos erros (tratamento de exceções) deve ser feita na camada de aplicação, onde você pode mapear os erros do domínio para respostas HTTP apropriadas ou outras formas de comunicação com o cliente.
+# ex.: um InvalidQuanitytError pode ser definido na camada de domínio para indicar que a quantidade de um produto é inválida, e na camada de aplicação, você pode capturar esse erro e retornar uma resposta HTTP 400 Bad Request com uma mensagem de erro adequada.

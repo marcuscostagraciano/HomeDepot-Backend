@@ -1,9 +1,7 @@
-from uuid import UUID
-
-from core.schemas.base import BaseSchema
+from core.schemas.base import BaseCreateSchema, BaseReadSchema
 
 
-class Product(BaseSchema):
+class Product(BaseCreateSchema):
     brand: str | None = None
     description: str | None = None
     price: float | None = None
@@ -13,11 +11,9 @@ class ProductCreate(Product):
     name: str
 
 
-class ProductRead(Product):
-    id: UUID
+class ProductRead(Product, BaseReadSchema):
     name: str
 
 
 class ProductUpdate(Product):
-    name: str | None = None
     name: str | None = None
