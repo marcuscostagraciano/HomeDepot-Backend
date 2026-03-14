@@ -3,12 +3,13 @@ from typing import List
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from db.db import get_async_session
-from db.models.list import List as ListModel
-from schemas.list import ListRead, ListCreate
+
+from ..models.list import List as ListModel
+from ..schemas import ListCreate, ListRead
 
 router = APIRouter(
     prefix="/lists",

@@ -1,10 +1,12 @@
-import uvicorn
-from fastapi import FastAPI
-from dotenv import dotenv_values
-from db.db import create_db_and_tables
 from contextlib import asynccontextmanager
 
-from routers import lists, products
+import uvicorn
+from dotenv import dotenv_values
+from fastapi import FastAPI
+
+from db.db import create_db_and_tables
+from lists import router as lists_router
+from products import router as products_router
 
 config = dotenv_values(".env")
 
@@ -19,8 +21,8 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(debug=DEBUG, lifespan=lifespan)
 
-app.include_router(lists.router)
-app.include_router(products.router)
+app.include_router(lists_router)
+app.include_router(products_router)
 
 
 def main():

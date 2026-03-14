@@ -3,12 +3,13 @@ from typing import List
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy import and_, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, and_
 
 from db.db import get_async_session
-from db.models.product import Product
-from schemas.product import ProductCreate, ProductUpdate, ProductRead
+
+from ..models import Product
+from ..schemas import ProductCreate, ProductRead, ProductUpdate
 
 router = APIRouter(
     prefix="/products", tags=["products"], dependencies=[Depends(get_async_session)]
@@ -115,4 +116,5 @@ async def delete_product(
     await session.delete(product)
     await session.commit()
 
+    return {"success": True}
     return {"success": True}

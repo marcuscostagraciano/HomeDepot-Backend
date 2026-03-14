@@ -1,5 +1,6 @@
 from uuid import UUID
-from .base import BaseSchema
+
+from core.schemas.base import BaseSchema
 
 
 class Product(BaseSchema):
@@ -18,4 +19,5 @@ class ProductRead(Product):
 
 
 class ProductUpdate(Product):
+    name: str | None = None
     name: str | None = None

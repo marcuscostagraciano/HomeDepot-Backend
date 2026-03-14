@@ -1,11 +1,12 @@
-from .base import Base
-from sqlalchemy.orm import Mapped
-from sqlalchemy import Text
-from sqlalchemy.orm import mapped_column
 from datetime import date
 
+from sqlalchemy import Text
+from sqlalchemy.orm import Mapped, mapped_column
 
-class List(Base):
+from core.models import BaseModel
+
+
+class List(BaseModel):
     observation: Mapped[str | None] = mapped_column(Text)
     bought: Mapped[bool] = mapped_column(default=False)
     created_at: Mapped[str] = mapped_column(default=str(date.today()))

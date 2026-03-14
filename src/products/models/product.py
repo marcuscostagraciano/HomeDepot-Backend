@@ -1,8 +1,9 @@
-from .base import Base
 from sqlalchemy.orm import Mapped
 
+from core.models import BaseModel
 
-class Product(Base):
+
+class Product(BaseModel):
     name: Mapped[str]
     brand: Mapped[str | None]
     description: Mapped[str | None]
