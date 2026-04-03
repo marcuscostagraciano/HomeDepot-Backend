@@ -1,6 +1,7 @@
 from typing import Any, Type
 from uuid import UUID
 
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.models import BaseModel
@@ -23,3 +24,7 @@ class SQLAlchemyRepository:
 
     async def read(self, id: UUID) -> Any | None:
         return await self.session.get(self.model, id)
+
+    async def read_all(self) -> list[Any]:
+        result = await self.session.execute(select(self.model))
+        return list(result.scalars().all())

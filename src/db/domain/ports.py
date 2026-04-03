@@ -1,7 +1,7 @@
-from typing import Protocol, TypeVar
+from typing import List, Protocol, TypeVar
 
 CreateModel = TypeVar("CreateModel", contravariant=True)
-ReturnSchema = TypeVar("ReturnSchema", covariant=True)
+ReturnSchema = TypeVar("ReturnSchema")
 RecordIdT = TypeVar("RecordIdT", contravariant=True)
 
 
@@ -19,6 +19,7 @@ class RepositoryPort(Protocol[CreateModel, ReturnSchema, RecordIdT]):
 
     async def create(self, payload: CreateModel) -> ReturnSchema: ...
     async def read(self, id: RecordIdT) -> ReturnSchema | None: ...
+    async def read_all(self) -> List[ReturnSchema]: ...
 
     # async def get_record(self, record_id: RecordIdT) -> ReturnRecordT | None:
     #     """Retrieve a record by ID.

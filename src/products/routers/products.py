@@ -2,13 +2,11 @@ from typing import List
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy import and_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 import core.errors as errors
 from db.db import get_async_session
-from products.domain import create_product as create_product_use_case
-from products.domain import read_product as read_product_use_case
+from products.domain import use_cases
 from products.repositories.product_repository import ProductRepository
 from products.schemas import ProductCreate, ProductRead
 
@@ -24,7 +22,7 @@ async def create_product(
 ) -> ProductRead:
     try:
         repository = ProductRepository(session)
-        product = await create_product_use_case(payload, repository)
+        product = await use_cases.create_product(payload, repository)
     except errors.BaseError as e:
         raise HTTPException(status_code=e.http_status_code, detail=str(e))
 
@@ -32,13 +30,26 @@ async def create_product(
 
 
 @router.get("/", response_model=List[ProductRead])
+async def read_products(
+    session: AsyncSession = Depends(get_async_session),
+) -> List[ProductRead]:
+    try:
+        repository = ProductRepository(session)
+        products = await use_cases.read_products(repository)
+    except errors.NotFoundError as e:
+        raise HTTPException(status_code=e.http_status_code, detail=str(e))
+
+    return products
+
+
+@router.get("/{id}", response_model=List[ProductRead])
 async def read_product(
     id: UUID,
     session: AsyncSession = Depends(get_async_session),
 ) -> ProductRead | None:
     try:
         repository = ProductRepository(session)
-        product = await read_product_use_case(id, repository)
+        product = await use_cases.read_product(id, repository)
     except errors.NotFoundError as e:
         raise HTTPException(status_code=e.http_status_code, detail=str(e))
 

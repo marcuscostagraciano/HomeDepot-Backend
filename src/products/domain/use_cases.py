@@ -28,3 +28,9 @@ async def read_product(
         raise NotFoundError("Product", str(product_id))
 
     return ProductRead.model_validate(product)
+
+
+async def read_products(repository: ProductRepositoryPort) -> list[ProductRead]:
+    products = await repository.read_all()
+
+    return [ProductRead.model_validate(product) for product in products]
