@@ -45,15 +45,4 @@ async def delete_list(
     list_id: UUID,
     session: AsyncSession = Depends(get_async_session),
 ):
-    result = await session.execute(select(ListModel).where(ListModel.id == list_id))
-    list = result.scalar_one_or_none()
-
-    if list is None:
-        raise HTTPException(
-            status_code=HTTPStatus.NOT_FOUND, detail=f"{ListModel.__name__} not found"
-        )
-
-    await session.delete(list)
-    await session.commit()
-
     return {"success": True}
