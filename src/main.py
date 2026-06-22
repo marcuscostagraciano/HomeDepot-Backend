@@ -7,6 +7,7 @@ from fastapi import FastAPI
 from db.db import create_db_and_tables
 from lists import router as lists_router
 from products import router as products_router
+from users import router as users_router
 
 config = dotenv_values(".env")
 
@@ -22,7 +23,8 @@ async def lifespan(app: FastAPI):
 app = FastAPI(debug=DEBUG, lifespan=lifespan)
 
 # app.include_router(lists_router)
-app.include_router(products_router)
+app.include_router(router=products_router)
+app.include_router(router=users_router)
 
 
 def main():
