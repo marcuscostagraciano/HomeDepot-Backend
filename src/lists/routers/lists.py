@@ -1,29 +1,18 @@
-from http import HTTPStatus
 from typing import List
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+import core.errors as errors
 from db.db import get_async_session
-
-from ..models.list import List as ListModel
-from ..schemas import ListCreate, ListRead
+from lists.domain import use_cases
+from lists.repositories.list_repository import ListRepository
+from lists.schemas.list import ListCreate, ListRead
 
 router = APIRouter(
-    prefix="/lists",
-    tags=["lists"],
+    prefix="/lists", tags=["lists"], dependencies=[Depends(get_async_session)]
 )
-
-
-@router.get("/", response_model=List[ListRead])
-async def read_lists(
-    session: AsyncSession = Depends(get_async_session),
-) -> List[ListRead]:
-    result = await session.execute(select(ListModel))
-    lists = result.scalars().all()
-    return [ListRead.model_validate(list) for list in lists]
 
 
 @router.post("/", response_model=ListRead)
@@ -31,29 +20,36 @@ async def create_list(
     list_create: ListCreate,
     session: AsyncSession = Depends(get_async_session),
 ):
-    new_list = ListModel(**list_create.model_dump())
+    try:
+        repository = ListRepository(session)
+        created = await use_cases.create_list(list_create, repository)
+    except errors.BaseError as e:
+        raise HTTPException(status_code=e.http_status_code, detail=str(e))
 
-    session.add(new_list)
-    await session.commit()
-    await session.refresh(new_list)
-
-    return ListRead.model_validate(new_list)
+    return created
 
 
-@router.delete("/{list_id}")
+@router.get("/{list_id}", response_model=ListRead)
+async def read_list(
+    list_id: UUID, session: AsyncSession = Depends(get_async_session)
+) -> ListRead:
+    try:
+        repository = ListRepository(session)
+        list_obj = await use_cases.read_list(list_id, repository)
+    except errors.NotFoundError as e:
+        raise HTTPException(status_code=e.http_status_code, detail=str(e))
+
+    return list_obj
+
+
+@router.delete("/{list_id}", response_model=ListRead)
 async def delete_list(
-    list_id: UUID,
-    session: AsyncSession = Depends(get_async_session),
+    list_id: UUID, session: AsyncSession = Depends(get_async_session)
 ):
-    result = await session.execute(select(ListModel).where(ListModel.id == list_id))
-    list = result.scalar_one_or_none()
+    try:
+        repository = ListRepository(session)
+        result = await use_cases.delete_list(list_id, repository)
+    except errors.BaseError as e:
+        raise HTTPException(status_code=e.http_status_code, detail=str(e))
 
-    if list is None:
-        raise HTTPException(
-            status_code=HTTPStatus.NOT_FOUND, detail=f"{ListModel.__name__} not found"
-        )
-
-    await session.delete(list)
-    await session.commit()
-
-    return {"success": True}
+    return result

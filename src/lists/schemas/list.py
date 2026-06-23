@@ -2,24 +2,20 @@ from uuid import UUID
 
 from pydantic import Field
 
-from core.schemas import BaseSchema
+from core.schemas import BaseCreateSchema, BaseReadSchema, BaseSchema
 
 
-class ListCreate(BaseSchema):
+class ListCreate(BaseCreateSchema):
     observation: str | None = Field(
         default=None, description="Observation about the list"
     )
+    created_by_id: UUID = Field(description="User id who created the list")
 
 
-class ListRead(BaseSchema):
-    id: UUID = Field(description="Unique identifier of the list")
-    observation: str | None = Field(
-        default=None, description="Observation about the list"
-    )
+class ListRead(ListCreate, BaseReadSchema):
     bought: bool = Field(default=False, description="Indicates if the list is bought")
-    created_at: str = Field(description="Timestamp of when the list was created")
-    updated_at: str | None = Field(
-        default=None, description="Timestamp of when the list was last updated"
+    updated_by_id: UUID | None = Field(
+        default=None, description="User id who last updated the list"
     )
 
 

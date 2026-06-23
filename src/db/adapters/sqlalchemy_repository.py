@@ -28,3 +28,14 @@ class SQLAlchemyRepository:
     async def read_all(self) -> list[Any]:
         result = await self.session.execute(select(self.model))
         return list(result.scalars().all())
+
+    async def delete(self, id: UUID) -> Any | None:
+        obj = await self.session.get(self.model, id)
+
+        if obj is None:
+            return None
+
+        await self.session.delete(obj)
+        await self.session.commit()
+
+        return obj
