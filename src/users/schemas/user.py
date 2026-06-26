@@ -15,7 +15,7 @@ class UserRead(User, BaseReadSchema):
     pass
 
 
-class UserUpdate(User):
+class UserUpdate(BaseCreateSchema):
     first_name: str | None = None
     last_name: str | None = None
     email: str | None = None

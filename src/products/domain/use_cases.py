@@ -14,9 +14,7 @@ async def create_product(
     if product.price is not None and product.price < 0:
         raise NotNegativeNumberError("price", product.price)
 
-    created = await repository.create(product)
-
-    return ProductRead.model_validate(created)
+    return await repository.create(product)
 
 
 async def read_product(
@@ -27,10 +25,10 @@ async def read_product(
     if not product:
         raise NotFoundError("Product", str(product_id))
 
-    return ProductRead.model_validate(product)
+    return product
 
 
 async def read_products(repository: ProductRepositoryPort) -> list[ProductRead]:
     products = await repository.read_all()
 
-    return [ProductRead.model_validate(product) for product in products]
+    return products

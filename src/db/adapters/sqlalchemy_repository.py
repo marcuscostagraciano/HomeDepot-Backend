@@ -1,4 +1,4 @@
-from typing import Any, Type
+from typing import Generic, Type, TypeVar
 from uuid import UUID
 
 from sqlalchemy import select
@@ -7,29 +7,44 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from core.models import BaseModel
 from core.schemas import BaseSchema
 
+CreateSchema = TypeVar("CreateSchema", bound=BaseSchema)
+Model = TypeVar("Model", bound=BaseModel)
+ReturnSchema = TypeVar("ReturnSchema", bound=BaseSchema)
 
-class SQLAlchemyRepository:
-    def __init__(self, session: AsyncSession, model: Type[BaseModel]) -> None:
+
+class SQLAlchemyRepository(Generic[CreateSchema, Model, ReturnSchema]):
+    def __init__(
+        self,
+        session: AsyncSession,
+        model: Type[Model],
+        schema: Type[ReturnSchema],
+    ) -> None:
         self.session = session
         self.model = model
+        self.schema = schema
 
-    async def create(self, payload: BaseSchema) -> Any:
+    async def create(self, payload: CreateSchema) -> ReturnSchema:
         db_obj = self.model(**payload.model_dump())
 
         self.session.add(db_obj)
         await self.session.commit()
         await self.session.refresh(db_obj)
 
-        return db_obj
+        return self.schema.model_validate(db_obj)
 
-    async def read(self, id: UUID) -> Any | None:
-        return await self.session.get(self.model, id)
+    async def read(self, id: UUID) -> ReturnSchema | None:
+        db_obj = await self.session.get(self.model, id)
 
-    async def read_all(self) -> list[Any]:
+        if db_obj is None:
+            return None
+
+        return self.schema.model_validate(db_obj)
+
+    async def read_all(self) -> list[ReturnSchema]:
         result = await self.session.execute(select(self.model))
-        return list(result.scalars().all())
+        return [self.schema.model_validate(obj) for obj in result.scalars().all()]
 
-    async def delete(self, id: UUID) -> Any | None:
+    async def delete(self, id: UUID) -> ReturnSchema | None:
         obj = await self.session.get(self.model, id)
 
         if obj is None:
@@ -38,4 +53,4 @@ class SQLAlchemyRepository:
         await self.session.delete(obj)
         await self.session.commit()
 
-        return obj
+        return self.schema.model_validate(obj)
