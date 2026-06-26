@@ -11,7 +11,7 @@ async def create_list(
 ) -> ListRead:
     created = await repository.create(list_payload)
 
-    return ListRead.model_validate(created)
+    return created
 
 
 async def read_list(list_id: UUID, repository: ListRepositoryPort) -> ListRead:
@@ -20,13 +20,13 @@ async def read_list(list_id: UUID, repository: ListRepositoryPort) -> ListRead:
     if not list_obj:
         raise NotFoundError("List", str(list_id))
 
-    return ListRead.model_validate(list_obj)
+    return list_obj
 
 
 async def read_lists(repository: ListRepositoryPort) -> list[ListRead]:
     lists = await repository.read_all()
 
-    return [ListRead.model_validate(list_obj) for list_obj in lists]
+    return lists
 
 
 async def delete_list(list_id: UUID, repository: ListRepositoryPort) -> ListRead:
@@ -35,4 +35,4 @@ async def delete_list(list_id: UUID, repository: ListRepositoryPort) -> ListRead
     if not deleted:
         raise NotFoundError("List", str(list_id))
 
-    return ListRead.model_validate(deleted)
+    return deleted

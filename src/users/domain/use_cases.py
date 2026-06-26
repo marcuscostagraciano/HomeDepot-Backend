@@ -26,4 +26,4 @@ async def read_user(user_id: UUID, repository: UserRepositoryPort) -> UserRead:
     if not user:
         raise NotFoundError("User", str(user_id))
 
-    return UserRead.model_validate(user)
+    return user
