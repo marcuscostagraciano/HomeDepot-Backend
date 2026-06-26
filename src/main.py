@@ -7,6 +7,7 @@ from core.utils import get_dotenv_config
 from db.db import create_db_and_tables
 from lists import router as lists_router
 from products import router as products_router
+from security import router as security_router
 from users import router as users_router
 
 DEBUG = get_dotenv_config("DEBUG", "False").lower() == "true"
@@ -23,6 +24,7 @@ app = FastAPI(debug=DEBUG, lifespan=lifespan)
 app.include_router(router=lists_router)
 app.include_router(router=products_router)
 app.include_router(router=users_router)
+app.include_router(router=security_router)
 
 
 def main():
