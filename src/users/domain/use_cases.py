@@ -25,6 +25,8 @@ async def create_user(
 
     return await repository.create(hashed_user)
 
+    return await repository.create(hashed_user)
+
 
 async def read_user(
     repository: UserRepositoryPort,

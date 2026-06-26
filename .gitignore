@@ -35,3 +35,6 @@ MANIFEST
 
 # IDE
 .vscode/
+
+# Coverage
+coverage/
