@@ -6,14 +6,11 @@ async def get_token(
     username: str,
     password: str,
     repository: AuthRepositoryPort,
+    jwt_service: JWTServicePort,
 ) -> TokenSchema:
     user = await repository.authenticate(username, password)
 
     if not user:
         raise UnauthorizedError("invalid credentials")
 
-    return generate_jwt_token(
-        {
-            "email": user.email,
-        }
-    )
+    return jwt_service.generate({"email": user.email})

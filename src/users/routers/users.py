@@ -21,10 +21,15 @@ router = APIRouter(
 async def create_user(
     payload: UserCreate,
     session: AsyncSession = Depends(get_async_session),
+    password_hasher: PasswordHasherPort = Depends(get_password_hasher),
 ) -> UserRead:
     try:
         repository = UserRepository(session)
-        user = await use_cases.create_user(payload, repository)
+        user = await use_cases.create_user(
+            payload,
+            repository,
+            password_hasher,
+        )
     except errors.BaseError as e:
         raise HTTPException(status_code=e.http_status_code, detail=str(e))
 

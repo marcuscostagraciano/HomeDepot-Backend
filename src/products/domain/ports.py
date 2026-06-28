@@ -9,7 +9,7 @@ from ..schemas import ProductCreate, ProductRead
 
 
 class ProductRepositoryPort(
-    RepositoryPort[ProductCreate, ProductRead, UUID],
+    RepositoryPort[ProductCreate, Product, ProductRead, UUID],
     Protocol,
 ):
     """Repository protocol for managing product persistence.
@@ -20,3 +20,5 @@ class ProductRepositoryPort(
     In another words, this protocol supplies the interface for the product repository,
     while also defining the types of the data it will handle.
     """
+
+    async def read_all(self, filters: ProductFilters) -> List[ProductRead]: ...

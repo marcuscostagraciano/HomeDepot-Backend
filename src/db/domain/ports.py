@@ -7,7 +7,7 @@ from core.domain import SortField, SortOrder
 from .types import CreateSchema, Model, QuerySelect, RecordIdT, ReturnSchema
 
 
-class RepositoryPort(Protocol[CreateModel, ReturnSchema, RecordIdT]):
+class RepositoryPort(Protocol[CreateSchema, Model, ReturnSchema, RecordIdT]):
     """Repository protocol for managing record persistence.
 
     Defines the interface for CRUD operations on records with generic types
@@ -19,10 +19,27 @@ class RepositoryPort(Protocol[CreateModel, ReturnSchema, RecordIdT]):
         ReturnRecordT: The type of the record returned by create and update operations
     """
 
-    async def create(self, payload: CreateModel) -> ReturnSchema: ...
+    def __init__(
+        self, session: AsyncSession, model: Type[Model], schema: Type[ReturnSchema]
+    ) -> None: ...
+
+    async def create(self, payload: CreateSchema) -> ReturnSchema: ...
     async def read(self, id: RecordIdT) -> ReturnSchema | None: ...
-    async def read_all(self) -> List[ReturnSchema]: ...
     async def delete(self, id: RecordIdT) -> ReturnSchema | None: ...
+    async def execute(self, query: QuerySelect[Model]) -> list[ReturnSchema]: ...
+    def apply_sort(
+        self,
+        query: QuerySelect[Model],
+        sort: SortField,
+        order: SortOrder,
+    ) -> QuerySelect[Model]: ...
+
+    def apply_pagination(
+        self,
+        query: QuerySelect[Model],
+        page: int,
+        limit: int,
+    ) -> QuerySelect[Model]: ...
 
     # async def get_record(self, record_id: RecordIdT) -> ReturnRecordT | None:
     #     """Retrieve a record by ID.

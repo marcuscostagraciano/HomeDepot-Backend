@@ -13,7 +13,7 @@ from ..schemas.user import UserCreate, UserRead
 
 
 class UserRepository(
-    SQLAlchemyRepository[UserCreate, User, UserRead],
+    SQLAlchemyRepository[UserCreate, User, UserRead, UUID],
     UserRepositoryPort,
 ):
     def __init__(self, session: AsyncSession) -> None:

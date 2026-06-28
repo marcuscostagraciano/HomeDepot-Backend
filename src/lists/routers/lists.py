@@ -12,7 +12,12 @@ from ..repositories.list_repository import ListRepository
 from ..schemas.list import ListCreate, ListRead
 
 router = APIRouter(
-    prefix="/lists", tags=["lists"], dependencies=[Depends(get_async_session)]
+    prefix="/lists",
+    tags=["lists"],
+    dependencies=[
+        Depends(get_async_session),
+        Depends(get_current_user),
+    ],
 )
 
 

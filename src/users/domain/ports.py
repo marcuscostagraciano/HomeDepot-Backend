@@ -8,7 +8,7 @@ from ..schemas import UserCreate, UserRead
 
 
 class UserRepositoryPort(
-    RepositoryPort[UserCreate, UserRead, UUID],
+    RepositoryPort[UserCreate, User, UserRead, UUID],
     Protocol,
 ):
     """Repository protocol for managing user persistence.

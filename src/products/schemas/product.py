@@ -2,18 +2,23 @@ from core.schemas.base import BaseCreateSchema, BaseQueryParamsSchema, BaseReadS
 
 
 class Product(BaseCreateSchema):
+    name: str
     brand: str | None = None
     description: str | None = None
     price: float | None = None
 
 
-class ProductCreate(Product):
-    name: str
+class ProductCreate(Product): ...
 
 
-class ProductRead(Product, BaseReadSchema):
-    name: str
+class ProductRead(Product, BaseReadSchema): ...
 
 
-class ProductUpdate(Product):
-    name: str | None = None
+class ProductUpdate(Product): ...
+
+
+class ProductQueryParams(BaseQueryParamsSchema):
+    search: str | None = None
+    brand: str | None = None
+    min_price: float | None = None
+    max_price: float | None = None

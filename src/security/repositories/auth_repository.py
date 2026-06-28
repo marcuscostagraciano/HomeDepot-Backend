@@ -10,14 +10,19 @@ from users.schemas.user import UserRead
 
 
 class AuthRepository(AuthRepositoryPort):
-    def __init__(self, session: AsyncSession) -> None:
+    def __init__(
+        self,
+        session: AsyncSession,
+        password_hasher: PasswordHasherPort,
+    ) -> None:
         self.session = session
+        self.password_hasher = password_hasher
 
     async def authenticate(self, email: str, password: str) -> UserRead | None:
         result = await self.session.execute(select(User).where(User.email == email))
         user = result.scalar_one_or_none()
 
-        if not user or not validate_hash(password, user.password):
+        if not user or not self.password_hasher.verify(password, user.password):
             return None
 
         return UserRead.model_validate(user)
@@ -25,5 +30,9 @@ class AuthRepository(AuthRepositoryPort):
 
 def get_auth_repository(
     session: AsyncSession = Depends(get_async_session),
+    password_hasher: PasswordHasherPort = Depends(get_password_hasher),
 ) -> AuthRepositoryPort:
-    return AuthRepository(session)
+    return AuthRepository(
+        session,
+        password_hasher,
+    )

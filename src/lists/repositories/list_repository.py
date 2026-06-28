@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from db.adapters.sqlalchemy_repository import SQLAlchemyRepository
@@ -8,7 +10,7 @@ from ..schemas.list import ListCreate, ListRead
 
 
 class ListRepository(
-    SQLAlchemyRepository[ListCreate, List, ListRead],
+    SQLAlchemyRepository[ListCreate, List, ListRead, UUID],
     ListRepositoryPort,
 ):
     def __init__(self, session: AsyncSession) -> None:

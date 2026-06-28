@@ -8,7 +8,7 @@ from ..schemas import ListCreate, ListRead
 
 
 class ListRepositoryPort(
-    RepositoryPort[ListCreate, ListRead, UUID],
+    RepositoryPort[ListCreate, List, ListRead, UUID],
     Protocol,
 ):
     """Repository protocol for managing list persistence."""

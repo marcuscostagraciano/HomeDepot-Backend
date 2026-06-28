@@ -7,7 +7,11 @@ from ..domain import UniqueEmailError, UserRepositoryPort
 from ..schemas import UserCreate, UserRead
 
 
-async def create_user(user: UserCreate, repository: UserRepositoryPort) -> UserRead:
+async def create_user(
+    user: UserCreate,
+    repository: UserRepositoryPort,
+    password_hasher: PasswordHasherPort,
+) -> UserRead:
     if not user.first_name:
         raise RequiredFieldMissingError("first_name")
     if not user.last_name:
@@ -20,9 +24,11 @@ async def create_user(user: UserCreate, repository: UserRepositoryPort) -> UserR
     if await repository.check_email_exists(user.email):
         raise UniqueEmailError()
 
-    return await repository.create(
-        user.model_copy(update={"password": generate_hash(user.password)})
+    hashed_user = user.model_copy(
+        update={"password": password_hasher.hash(user.password)}
     )
+
+    return await repository.create(hashed_user)
 
 
 async def read_user(user_id: UUID, repository: UserRepositoryPort) -> UserRead:

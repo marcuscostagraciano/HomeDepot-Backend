@@ -13,7 +13,3 @@ Exports:
         Supports filtering by brand, price range, and full-text search.
         Prefix: /products | Tags: ['products']
 """
-
-from .routers import router
-
-__all__ = ["router"]

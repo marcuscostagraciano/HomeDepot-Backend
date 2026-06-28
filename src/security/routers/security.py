@@ -14,9 +14,11 @@ router = APIRouter(prefix="/token", tags=["token"])
 async def get_token(
     form_data: OAuth2PasswordRequestForm = Depends(),
     repository: AuthRepositoryPort = Depends(get_auth_repository),
+    jwt_service: JWTServicePort = Depends(get_jwt_service),
 ) -> TokenSchema:
     return await get_token_use_case(
         username=form_data.username,
         password=form_data.password,
         repository=repository,
+        jwt_service=jwt_service,
     )

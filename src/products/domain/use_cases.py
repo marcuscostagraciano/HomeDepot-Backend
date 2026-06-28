@@ -29,7 +29,8 @@ async def read_product(
     return product
 
 
-async def read_products(repository: ProductRepositoryPort) -> list[ProductRead]:
-    products = await repository.read_all()
-
-    return products
+async def read_products(
+    repository: ProductRepositoryPort,
+    filters: ProductFilters,
+) -> list[ProductRead]:
+    return await repository.read_all(filters)
