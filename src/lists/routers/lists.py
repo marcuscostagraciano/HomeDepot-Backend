@@ -1,14 +1,15 @@
-from typing import List
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
-import core.errors as errors
+import core.domain as errors
 from db.db import get_async_session
-from lists.domain import use_cases
-from lists.repositories.list_repository import ListRepository
-from lists.schemas.list import ListCreate, ListRead
+from users.adapters import get_current_user
+
+from ..domain import use_cases
+from ..repositories.list_repository import ListRepository
+from ..schemas.list import ListCreate, ListRead
 
 router = APIRouter(
     prefix="/lists", tags=["lists"], dependencies=[Depends(get_async_session)]

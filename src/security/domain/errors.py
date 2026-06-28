@@ -1,6 +1,6 @@
 from http import HTTPStatus
 
-from core.errors import BaseError
+from core.domain import BaseError
 
 
 class UnauthorizedError(BaseError):

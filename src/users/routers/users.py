@@ -1,14 +1,16 @@
-from typing import List
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
-import core.errors as errors
+import core.domain as errors
 from db.db import get_async_session
-from users.domain import use_cases
-from users.repositories.user_repository import UserRepository
-from users.schemas.user import UserCreate, UserRead
+from security.adapters import get_password_hasher
+from security.domain import PasswordHasherPort
+
+from ..domain import use_cases
+from ..repositories.user_repository import UserRepository
+from ..schemas.user import UserCreate, UserRead
 
 router = APIRouter(
     prefix="/users", tags=["users"], dependencies=[Depends(get_async_session)]

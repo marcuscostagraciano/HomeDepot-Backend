@@ -2,7 +2,9 @@ from typing import Protocol
 from uuid import UUID
 
 from db.domain import RepositoryPort
-from users.schemas.user import UserCreate, UserRead
+
+from ..models import User
+from ..schemas import UserCreate, UserRead
 
 
 class UserRepositoryPort(

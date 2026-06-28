@@ -2,7 +2,9 @@ from typing import Protocol
 from uuid import UUID
 
 from db.domain import RepositoryPort
-from lists.schemas import ListCreate, ListRead
+
+from ..models import List
+from ..schemas import ListCreate, ListRead
 
 
 class ListRepositoryPort(

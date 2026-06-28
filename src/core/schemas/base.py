@@ -1,7 +1,9 @@
 from datetime import datetime
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
+
+from ..domain import SortField, SortOrder
 
 
 class BaseSchema(BaseModel):
@@ -16,13 +18,12 @@ class BaseSchema(BaseModel):
     model_config = ConfigDict(
         from_attributes=True,
         frozen=True,
+        use_enum_values=True,
     )
 
 
 class BaseCreateSchema(BaseSchema):
-    """
-    Schema used as a base for all `create` operations.
-    """
+    """Schema used as a base for all `create` operations."""
 
     ...
 
@@ -37,3 +38,24 @@ class BaseReadSchema(BaseSchema):
     id: UUID
     created_date: datetime
     updated_date: datetime | None
+
+
+class BaseQueryParamsSchema(BaseSchema):
+    """Schema used as a base for all query parameters."""
+
+    page: int = Field(
+        default=1,
+        description="Page number for paginated results. Starts at 1.",
+    )
+    limit: int = Field(
+        default=20,
+        description="Maximum number of items to return per page.",
+    )
+    sort: SortField = Field(
+        default=SortField.ID,
+        description="Field used to sort the returned results.",
+    )
+    order: SortOrder = Field(
+        default=SortOrder.ASC,
+        description="Sort order for the returned results (ascending or descending).",
+    )

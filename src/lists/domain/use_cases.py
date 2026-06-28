@@ -1,8 +1,8 @@
 from uuid import UUID
 
-from core.errors import NotFoundError
-from lists.schemas.list import ListCreate, ListRead
+from core.domain import NotFoundError
 
+from ..schemas.list import ListCreate, ListRead
 from .ports import ListRepositoryPort
 
 

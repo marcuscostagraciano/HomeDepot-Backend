@@ -1,15 +1,10 @@
-from typing import Generic, Type, TypeVar
-from uuid import UUID
+from typing import Generic, Type
 
-from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from core.models import BaseModel
-from core.schemas import BaseSchema
+from core.domain import SortField, SortFieldMapping, SortOrder
 
-CreateSchema = TypeVar("CreateSchema", bound=BaseSchema)
-Model = TypeVar("Model", bound=BaseModel)
-ReturnSchema = TypeVar("ReturnSchema", bound=BaseSchema)
+from ..domain import CreateSchema, Model, QuerySelect, RecordIdT, ReturnSchema
 
 
 class SQLAlchemyRepository(Generic[CreateSchema, Model, ReturnSchema]):

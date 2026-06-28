@@ -1,9 +1,16 @@
-from sqlalchemy.ext.asyncio import AsyncSession
+from uuid import UUID
 
+from sqlalchemy import and_, select
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.sql.elements import BinaryExpression, ColumnElement
+
+from core.domain import SortField, SortFieldMapping
 from db.adapters.sqlalchemy_repository import SQLAlchemyRepository
-from products.domain.ports import ProductRepositoryPort
-from products.models import Product
-from products.schemas.product import ProductCreate, ProductRead
+from db.domain import QuerySelect
+
+from ..domain import ProductFilters, ProductRepositoryPort
+from ..models import Product
+from ..schemas import ProductCreate, ProductRead
 
 
 class ProductRepository(

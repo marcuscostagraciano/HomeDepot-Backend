@@ -1,8 +1,9 @@
 from uuid import UUID
 
-from core.errors import NotFoundError, NotNegativeNumberError, RequiredFieldMissingError
-from products.domain import ProductRepositoryPort
-from products.schemas import ProductCreate, ProductRead
+from core.domain import NotFoundError, NotNegativeNumberError, RequiredFieldMissingError
+
+from ..domain import ProductFilters, ProductRepositoryPort
+from ..schemas import ProductCreate, ProductRead
 
 
 async def create_product(

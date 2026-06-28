@@ -1,7 +1,11 @@
-from .ports import CreateModel, RepositoryPort, ReturnSchema
+from .ports import RepositoryPort
+from .types import CreateSchema, Model, QuerySelect, RecordIdT, ReturnSchema
 
 __all__ = [
-    "CreateModel",
+    "CreateSchema",
+    "Model",
+    "QuerySelect",
+    "RecordIdT",
     "RepositoryPort",
     "ReturnSchema",
 ]

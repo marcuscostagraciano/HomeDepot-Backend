@@ -1,4 +1,4 @@
-from core.schemas.base import BaseCreateSchema, BaseReadSchema
+from core.schemas.base import BaseCreateSchema, BaseQueryParamsSchema, BaseReadSchema
 
 
 class Product(BaseCreateSchema):

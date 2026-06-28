@@ -1,11 +1,15 @@
+from uuid import UUID
+
 from fastapi import Depends
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from db.adapters.sqlalchemy_repository import SQLAlchemyRepository, select
+from db.adapters.sqlalchemy_repository import SQLAlchemyRepository
 from db.db import get_async_session
-from users.domain.ports import UserRepositoryPort
-from users.models.user import User
-from users.schemas.user import UserCreate, UserRead
+
+from ..domain.ports import UserRepositoryPort
+from ..models.user import User
+from ..schemas.user import UserCreate, UserRead
 
 
 class UserRepository(

@@ -1,7 +1,5 @@
-from security.domain.errors import UnauthorizedError
-from security.domain.ports import AuthRepositoryPort
-from security.schemas import TokenSchema
-from security.utils import generate_jwt_token
+from ..domain import AuthRepositoryPort, JWTServicePort, UnauthorizedError
+from ..schemas import TokenSchema
 
 
 async def get_token(

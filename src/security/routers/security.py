@@ -1,10 +1,11 @@
 from fastapi import APIRouter, Depends
 from fastapi.security import OAuth2PasswordRequestForm
 
-from security.domain import AuthRepositoryPort
-from security.domain import get_token as get_token_use_case
-from security.repositories import get_auth_repository
-from security.schemas.token import TokenSchema
+from ..adapters import get_jwt_service
+from ..domain import AuthRepositoryPort, JWTServicePort
+from ..domain import get_token as get_token_use_case
+from ..repositories import get_auth_repository
+from ..schemas.token import TokenSchema
 
 router = APIRouter(prefix="/token", tags=["token"])
 

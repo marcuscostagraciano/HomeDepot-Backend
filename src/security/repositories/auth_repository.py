@@ -3,8 +3,8 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from db.db import get_async_session
-from security.domain.ports import AuthRepositoryPort
-from security.utils.utils import validate_hash
+from security.adapters import get_password_hasher
+from security.domain import AuthRepositoryPort, PasswordHasherPort
 from users.models.user import User
 from users.schemas.user import UserRead
 

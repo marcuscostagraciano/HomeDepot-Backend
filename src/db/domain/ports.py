@@ -1,8 +1,10 @@
-from typing import List, Protocol, TypeVar
+from typing import Protocol, Type
 
-CreateModel = TypeVar("CreateModel", contravariant=True)
-ReturnSchema = TypeVar("ReturnSchema")
-RecordIdT = TypeVar("RecordIdT", contravariant=True)
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from core.domain import SortField, SortOrder
+
+from .types import CreateSchema, Model, QuerySelect, RecordIdT, ReturnSchema
 
 
 class RepositoryPort(Protocol[CreateModel, ReturnSchema, RecordIdT]):

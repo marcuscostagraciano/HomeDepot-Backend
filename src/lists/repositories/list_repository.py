@@ -1,9 +1,10 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from db.adapters.sqlalchemy_repository import SQLAlchemyRepository
-from lists.domain.ports import ListRepositoryPort
-from lists.models import List
-from lists.schemas.list import ListCreate, ListRead
+
+from ..domain.ports import ListRepositoryPort
+from ..models import List
+from ..schemas.list import ListCreate, ListRead
 
 
 class ListRepository(

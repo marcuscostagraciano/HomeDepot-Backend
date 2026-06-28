@@ -1,8 +1,11 @@
-from typing import Protocol
+from typing import List, Protocol
 from uuid import UUID
 
 from db.domain import RepositoryPort
-from products.schemas import ProductCreate, ProductRead
+
+from ..domain import ProductFilters
+from ..models import Product
+from ..schemas import ProductCreate, ProductRead
 
 
 class ProductRepositoryPort(

@@ -1,10 +1,10 @@
-from typing import List
+from http import HTTPStatus
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
-import core.errors as errors
+import core.domain as errors
 from db.db import get_async_session
 from products.domain import use_cases
 from products.repositories.product_repository import ProductRepository

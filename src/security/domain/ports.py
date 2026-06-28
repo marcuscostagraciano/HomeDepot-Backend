@@ -1,6 +1,8 @@
-from typing import Protocol
+from typing import Any, Dict, Protocol
 
 from users.schemas.user import UserRead
+
+from ..schemas.token import TokenSchema
 
 
 class AuthRepositoryPort(Protocol):
