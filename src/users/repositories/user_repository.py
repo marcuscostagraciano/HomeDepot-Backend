@@ -38,7 +38,7 @@ class UserRepository(
             select(UserModel).where(UserModel.email == email)
         )
 
-        user_result: UserModel = result.scalar_one_or_none()
+        user_result: UserModel | None = result.scalar_one_or_none()
         return UserRead.from_dict(user_result.to_dict()) if user_result else None
 
     async def check_email_exists(self, email: str) -> bool:
