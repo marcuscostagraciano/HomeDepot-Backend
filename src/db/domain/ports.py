@@ -1,13 +1,9 @@
-from typing import Protocol, Type
+from typing import Protocol
 
-from sqlalchemy.ext.asyncio import AsyncSession
-
-from core.domain import SortField, SortOrder
-
-from .types import CreateSchema, Model, QuerySelect, RecordIdT, ReturnSchema
+from .types import DomainCreateSchemaT, DomainSchemaT, RecordIdT
 
 
-class RepositoryPort(Protocol[CreateSchema, Model, ReturnSchema, RecordIdT]):
+class RepositoryPort(Protocol[DomainCreateSchemaT, DomainSchemaT, RecordIdT]):
     """Repository protocol for managing record persistence.
 
     Defines the interface for CRUD operations on records with generic types
@@ -19,27 +15,18 @@ class RepositoryPort(Protocol[CreateSchema, Model, ReturnSchema, RecordIdT]):
         ReturnRecordT: The type of the record returned by create and update operations
     """
 
-    def __init__(
-        self, session: AsyncSession, model: Type[Model], schema: Type[ReturnSchema]
-    ) -> None: ...
-
-    async def create(self, payload: CreateSchema) -> ReturnSchema: ...
-    async def read(self, id: RecordIdT) -> ReturnSchema | None: ...
-    async def delete(self, id: RecordIdT) -> ReturnSchema | None: ...
-    async def execute(self, query: QuerySelect[Model]) -> list[ReturnSchema]: ...
-    def apply_sort(
+    async def create(
         self,
-        query: QuerySelect[Model],
-        sort: SortField,
-        order: SortOrder,
-    ) -> QuerySelect[Model]: ...
-
-    def apply_pagination(
+        payload: DomainCreateSchemaT,
+    ) -> DomainSchemaT: ...
+    async def read(
         self,
-        query: QuerySelect[Model],
-        page: int,
-        limit: int,
-    ) -> QuerySelect[Model]: ...
+        id: RecordIdT,
+    ) -> DomainSchemaT | None: ...
+    async def delete(
+        self,
+        id: RecordIdT,
+    ) -> DomainSchemaT | None: ...
 
     # async def get_record(self, record_id: RecordIdT) -> ReturnRecordT | None:
     #     """Retrieve a record by ID.

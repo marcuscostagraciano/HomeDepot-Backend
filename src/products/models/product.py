@@ -1,9 +1,9 @@
 from sqlalchemy.orm import Mapped
 
-from core.models import BaseModel
+from core.models.auditable import AuditableModel
 
 
-class Product(BaseModel):
+class Product(AuditableModel):
     name: Mapped[str]
     brand: Mapped[str | None]
     description: Mapped[str | None]

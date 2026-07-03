@@ -1,14 +1,21 @@
 from uuid import UUID
 
-from core.domain import NotFoundError, NotNegativeNumberError, RequiredFieldMissingError
+from core.domain.errors import (
+    NotFoundError,
+    NotNegativeNumberError,
+    RequiredFieldMissingError,
+)
 
-from ..domain import ProductFilters, ProductRepositoryPort
-from ..schemas import ProductCreate, ProductRead
+from ..domain.filters import ProductFilters
+from ..domain.ports import ProductRepositoryPort
+from ..domain.schemas import Product, ProductCreate
 
 
 async def create_product(
-    product: ProductCreate, repository: ProductRepositoryPort
-) -> ProductRead:
+    repository: ProductRepositoryPort,
+    product: ProductCreate,
+    user_id: UUID,
+) -> Product:
     if not product.name:
         raise RequiredFieldMissingError("name")
 
@@ -19,8 +26,9 @@ async def create_product(
 
 
 async def read_product(
-    product_id: UUID, repository: ProductRepositoryPort
-) -> ProductRead:
+    repository: ProductRepositoryPort,
+    product_id: UUID,
+) -> Product:
     product = await repository.read(product_id)
 
     if not product:
@@ -32,5 +40,5 @@ async def read_product(
 async def read_products(
     repository: ProductRepositoryPort,
     filters: ProductFilters,
-) -> list[ProductRead]:
+) -> list[Product]:
     return await repository.read_all(filters)

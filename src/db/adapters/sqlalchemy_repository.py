@@ -1,75 +1,116 @@
-from typing import Generic, Type
+from abc import ABC, abstractmethod
+from typing import Generic, Tuple, Type
 
+from sqlalchemy import Select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from core.domain import SortField, SortFieldMapping, SortOrder
+from core.domain.enums import SortFieldEnum, SortOrderEnum
 
-from ..domain import CreateSchema, Model, QuerySelect, RecordIdT, ReturnSchema
+from ..domain.types import DomainCreateSchemaT, DomainSchemaT, RecordIdT
+from .types import ORMModelT, SortFieldMapping
 
 
-class SQLAlchemyRepository(Generic[CreateSchema, Model, ReturnSchema, RecordIdT]):
+class SQLAlchemyRepository(
+    ABC,
+    Generic[
+        DomainCreateSchemaT,
+        DomainSchemaT,
+        ORMModelT,
+        RecordIdT,
+    ],
+):
     SORT_FIELDS: SortFieldMapping = {}
 
     def __init__(
         self,
         session: AsyncSession,
-        model: Type[Model],
-        schema: Type[ReturnSchema],
+        model: Type[DomainSchemaT],
+        orm_model: Type[ORMModelT],
     ) -> None:
         self.session = session
         self.model = model
-        self.schema = schema
+        self.orm_model = orm_model
 
-    async def create(self, payload: CreateSchema) -> ReturnSchema:
-        db_obj = self.model(**payload.model_dump())
+    @abstractmethod
+    def _to_orm(self, entity: DomainCreateSchemaT) -> ORMModelT:
+        """Converts from the `domain` to the `model`. `Domain` > `Adapter`.
 
-        self.session.add(db_obj)
+        Args:
+            entity (DomainCreateSchemaT): `Domain` implementation of the resource.
+
+        Returns:
+            ORMModelT: `Adapter` implementation  of the resource.
+        """
+        ...
+
+    @abstractmethod
+    def _to_entity(self, model: ORMModelT) -> DomainSchemaT:
+        """Converts from the `model` to the domain``. `Adapter` > `Domain`.
+
+        Args:
+            model (ORMModelT): `Adapter` implementation  of the resource.
+
+        Returns:
+            DomainSchemaT: `Domain` implementation of the resource.
+        """
+        ...
+
+    async def create(
+        self,
+        payload: DomainCreateSchemaT,
+    ) -> DomainSchemaT:
+        orm = self._to_orm(payload)
+
+        self.session.add(orm)
         await self.session.commit()
-        await self.session.refresh(db_obj)
+        await self.session.refresh(orm)
 
-        return self.schema.model_validate(db_obj)
+        return self._to_entity(orm)
 
-    async def read(self, id: RecordIdT) -> ReturnSchema | None:
-        db_obj = await self.session.get(self.model, id)
+    async def read(
+        self,
+        id: RecordIdT,
+    ) -> DomainSchemaT | None:
+        orm = await self.session.get(self.orm_model, id)
 
-        if db_obj is None:
+        if orm is None:
             return None
 
-        return self.schema.model_validate(db_obj)
+        return self._to_entity(orm)
 
-    async def delete(self, id: RecordIdT) -> ReturnSchema | None:
-        obj = await self.session.get(self.model, id)
+    async def delete(self, id: RecordIdT) -> DomainSchemaT | None:
+        orm = await self.session.get(self.orm_model, id)
 
-        if obj is None:
+        if orm is None:
             return None
 
-        await self.session.delete(obj)
+        await self.session.delete(orm)
         await self.session.commit()
 
-        return self.schema.model_validate(obj)
+        return self._to_entity(orm)
 
-    async def execute(self, query: QuerySelect[Model]) -> list[ReturnSchema]:
+    async def _execute(self, query: Select[Tuple[ORMModelT]]) -> list[ORMModelT]:
         result = await self.session.execute(query)
 
-        return [self.schema.model_validate(obj) for obj in result.scalars().all()]
+        return [obj for obj in result.scalars().all()]
 
-    def apply_sort(
+    def _apply_sort(
         self,
-        query: QuerySelect[Model],
-        sort: SortField,
-        order: SortOrder,
-    ) -> QuerySelect[Model]:
+        query: Select[Tuple[ORMModelT]],
+        sort: SortFieldEnum,
+        order: SortOrderEnum,
+    ) -> Select[Tuple[ORMModelT]]:
         column = self.SORT_FIELDS[sort]
 
-        if order is SortOrder.DESC:
+        if order is SortOrderEnum.DESC:
             return query.order_by(column.desc())
 
         return query.order_by(column.asc())
 
-    def apply_pagination(
+    def _apply_pagination(
         self,
-        query: QuerySelect[Model],
+        query: Select[Tuple[ORMModelT]],
         page: int,
         limit: int,
-    ) -> QuerySelect[Model]:
+    ) -> Select[Tuple[ORMModelT]]:
         return query.offset((page - 1) * limit).limit(limit)

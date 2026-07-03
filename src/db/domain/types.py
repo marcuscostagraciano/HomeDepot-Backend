@@ -1,12 +1,18 @@
-from typing import Tuple, TypeVar
+from typing import TypeVar
 
-from sqlalchemy import Select
+from core.domain.schemas import DomainCreateSchema, DomainSchema
 
-from core.models import BaseModel
-from core.schemas import BaseSchema
-
-CreateSchema = TypeVar("CreateSchema", bound=BaseSchema)
-Model = TypeVar("Model", bound=BaseModel)
-RecordIdT = TypeVar("RecordIdT", contravariant=True)
-ReturnSchema = TypeVar("ReturnSchema", bound=BaseSchema)
-type QuerySelect[Model] = Select[Tuple[Model]]
+DomainCreateSchemaT = TypeVar(
+    "DomainCreateSchemaT",
+    contravariant=True,
+    bound=DomainCreateSchema,
+)
+DomainSchemaT = TypeVar(
+    "DomainSchemaT",
+    covariant=True,
+    bound=DomainSchema,
+)
+RecordIdT = TypeVar(
+    "RecordIdT",
+    contravariant=True,
+)

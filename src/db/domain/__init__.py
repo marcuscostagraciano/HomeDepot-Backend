@@ -1,11 +1,9 @@
 from .ports import RepositoryPort
-from .types import CreateSchema, Model, QuerySelect, RecordIdT, ReturnSchema
+from .types import DomainCreateSchemaT, DomainSchemaT, RecordIdT
 
 __all__ = [
-    "CreateSchema",
-    "Model",
-    "QuerySelect",
+    "DomainCreateSchemaT",
+    "DomainSchemaT",
     "RecordIdT",
     "RepositoryPort",
-    "ReturnSchema",
 ]

@@ -1,12 +1,12 @@
 from enum import StrEnum
 
 
-class SortField(StrEnum):
+class SortFieldEnum(StrEnum):
     ID = "id"
     CREATED_DATE = "created_date"
     UPDATED_DATE = "updated_date"
 
 
-class SortOrder(StrEnum):
+class SortOrderEnum(StrEnum):
     ASC = "asc"
     DESC = "desc"

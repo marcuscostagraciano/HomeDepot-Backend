@@ -1,14 +1,20 @@
 from typing import Protocol
 from uuid import UUID
 
-from db.domain import RepositoryPort
+from db.domain.ports import RepositoryPort
 
-from ..models import List
-from ..schemas import ListCreate, ListRead
+from ..domain.filters import ListFilters
+from .schemas import ListCreate, ListRead
 
 
 class ListRepositoryPort(
-    RepositoryPort[ListCreate, List, ListRead, UUID],
+    RepositoryPort[
+        ListCreate,
+        ListRead,
+        UUID,
+    ],
     Protocol,
 ):
     """Repository protocol for managing list persistence."""
+
+    async def read_all(self, filters: ListFilters) -> list[ListRead]: ...

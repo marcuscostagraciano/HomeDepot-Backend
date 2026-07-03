@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from .enums import SortField, SortOrder
+from .enums import SortFieldEnum, SortOrderEnum
 from .errors import GreaterEqualError, OutsideLimitError
 
 
@@ -8,8 +8,8 @@ from .errors import GreaterEqualError, OutsideLimitError
 class BaseFilter:
     page: int
     limit: int
-    sort: SortField
-    order: SortOrder
+    sort: SortFieldEnum
+    order: SortOrderEnum
 
     def __post_init__(self):
         if self.page < 1:

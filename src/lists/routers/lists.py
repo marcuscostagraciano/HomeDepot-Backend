@@ -1,61 +1,68 @@
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi import APIRouter, Depends
 
-import core.domain as errors
-from db.db import get_async_session
-from users.adapters import get_current_user
+from core.presentation.dependencies import RequestContext, get_request_context
 
-from ..domain import use_cases
+from ..domain.filters import ListFilters
+from ..domain.schemas import ListCreate
+from ..domain.use_cases import create_list as create_list_case
+from ..domain.use_cases import delete_list as delete_list_case
+from ..domain.use_cases import read_list as read_list_case
+from ..domain.use_cases import read_lists as read_lists_case
+from ..presentation.query_params import get_list_filters
+from ..presentation.requests import ListCreateRequestPresentation as CreateRequest
+from ..presentation.responses import ListReadResponsePresentation as Response
 from ..repositories.list_repository import ListRepository
-from ..schemas.list import ListCreate, ListRead
 
-router = APIRouter(
-    prefix="/lists",
-    tags=["lists"],
-    dependencies=[
-        Depends(get_async_session),
-        Depends(get_current_user),
-    ],
-)
+router = APIRouter(prefix="/lists", tags=["lists"])
 
 
-@router.post("/", response_model=ListRead)
+@router.post("/", response_model=Response)
 async def create_list(
-    list_create: ListCreate,
-    session: AsyncSession = Depends(get_async_session),
-):
-    try:
-        repository = ListRepository(session)
-        created = await use_cases.create_list(list_create, repository)
-    except errors.BaseError as e:
-        raise HTTPException(status_code=e.http_status_code, detail=str(e))
+    list_create: CreateRequest,
+    context: RequestContext = Depends(get_request_context),
+) -> Response:
+    created = await create_list_case(
+        ListRepository(context.session),
+        ListCreate.from_dict(list_create.to_dict()),
+        context.user.id,
+    )
 
-    return created
+    return Response.from_dict(created.to_dict())
 
 
-@router.get("/{list_id}", response_model=ListRead)
+@router.get("", response_model=list[Response])
+async def read_lists(
+    filters: ListFilters = Depends(get_list_filters),
+    context: RequestContext = Depends(get_request_context),
+) -> list[Response]:
+    repository = ListRepository(context.session)
+    lists = await read_lists_case(repository, filters)
+
+    return [Response.from_dict(obj.to_dict()) for obj in lists]
+
+
+@router.get("/{list_id}", response_model=Response)
 async def read_list(
-    list_id: UUID, session: AsyncSession = Depends(get_async_session)
-) -> ListRead:
-    try:
-        repository = ListRepository(session)
-        list_obj = await use_cases.read_list(list_id, repository)
-    except errors.NotFoundError as e:
-        raise HTTPException(status_code=e.http_status_code, detail=str(e))
+    list_id: UUID,
+    context: RequestContext = Depends(get_request_context),
+) -> Response:
+    repository = ListRepository(context.session)
+    list = await read_list_case(repository, list_id)
 
-    return list_obj
+    return Response.from_dict(list.to_dict())
 
 
-@router.delete("/{list_id}", response_model=ListRead)
+@router.delete("/{list_id}", response_model=Response)
 async def delete_list(
-    list_id: UUID, session: AsyncSession = Depends(get_async_session)
+    list_id: UUID,
+    context: RequestContext = Depends(get_request_context),
 ):
-    try:
-        repository = ListRepository(session)
-        result = await use_cases.delete_list(list_id, repository)
-    except errors.BaseError as e:
-        raise HTTPException(status_code=e.http_status_code, detail=str(e))
+    list = await delete_list_case(
+        ListRepository(context.session),
+        list_id,
+        context.user.id,
+    )
 
-    return result
+    return Response.from_dict(list.to_dict())
