@@ -1,11 +1,11 @@
-from typing import List, Protocol, TypeVar
+from typing import Protocol
 
-CreateModel = TypeVar("CreateModel", contravariant=True)
-ReturnSchema = TypeVar("ReturnSchema")
-RecordIdT = TypeVar("RecordIdT", contravariant=True)
+from .types import CreatorIdT, DomainCreateSchemaT, DomainSchemaT, RecordIdT
 
 
-class RepositoryPort(Protocol[CreateModel, ReturnSchema, RecordIdT]):
+class RepositoryPort(
+    Protocol[DomainCreateSchemaT, DomainSchemaT, RecordIdT, CreatorIdT]
+):
     """Repository protocol for managing record persistence.
 
     Defines the interface for CRUD operations on records with generic types
@@ -17,10 +17,19 @@ class RepositoryPort(Protocol[CreateModel, ReturnSchema, RecordIdT]):
         ReturnRecordT: The type of the record returned by create and update operations
     """
 
-    async def create(self, payload: CreateModel) -> ReturnSchema: ...
-    async def read(self, id: RecordIdT) -> ReturnSchema | None: ...
-    async def read_all(self) -> List[ReturnSchema]: ...
-    async def delete(self, id: RecordIdT) -> ReturnSchema | None: ...
+    async def create(
+        self,
+        payload: DomainCreateSchemaT,
+        creator_id: CreatorIdT | None = None,
+    ) -> DomainSchemaT: ...
+    async def read(
+        self,
+        id: RecordIdT,
+    ) -> DomainSchemaT | None: ...
+    async def delete(
+        self,
+        id: RecordIdT,
+    ) -> DomainSchemaT | None: ...
 
     # async def get_record(self, record_id: RecordIdT) -> ReturnRecordT | None:
     #     """Retrieve a record by ID.

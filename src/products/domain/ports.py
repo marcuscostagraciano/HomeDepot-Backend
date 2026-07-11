@@ -1,12 +1,19 @@
-from typing import Protocol
+from typing import List, Protocol
 from uuid import UUID
 
-from db.domain import RepositoryPort
-from products.schemas import ProductCreate, ProductRead
+from db.domain.ports import RepositoryPort
+
+from ..domain.filters import ProductFilters
+from ..domain.schemas import Product, ProductCreate
 
 
 class ProductRepositoryPort(
-    RepositoryPort[ProductCreate, ProductRead, UUID],
+    RepositoryPort[
+        ProductCreate,
+        Product,
+        UUID,
+        UUID,
+    ],
     Protocol,
 ):
     """Repository protocol for managing product persistence.
@@ -17,3 +24,5 @@ class ProductRepositoryPort(
     In another words, this protocol supplies the interface for the product repository,
     while also defining the types of the data it will handle.
     """
+
+    async def read_all(self, filters: ProductFilters) -> List[Product]: ...

@@ -1,5 +1,6 @@
 import uuid
 from datetime import datetime
+from typing import Any
 
 from sqlalchemy import DateTime, func
 from sqlalchemy.dialects.postgresql import UUID
@@ -11,6 +12,8 @@ class BaseModel(DeclarativeBase):
 
     It provides a common `UUID` id field and automatically generates the `__tablename__` based on the class name.
     """
+
+    __abstract__ = True
 
     id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
@@ -24,6 +27,14 @@ class BaseModel(DeclarativeBase):
         DateTime(timezone=True), onupdate=func.now(), default=None, nullable=True
     )
 
-    @declared_attr
+    @declared_attr.directive
     def __tablename__(cls) -> str:
         return cls.__name__.lower()
+
+    def to_dict(self) -> dict[str, Any]:
+        """Returns the `dict` representation of said object.
+
+        Returns:
+            dict[str, Any]: Dictionary containing the object's information.
+        """
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}

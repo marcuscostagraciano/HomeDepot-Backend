@@ -3,14 +3,13 @@ from contextlib import asynccontextmanager
 import uvicorn
 from fastapi import FastAPI
 
-from core.utils import get_dotenv_config
+from core.config import Settings
 from db.db import create_db_and_tables
-from lists import router as lists_router
-from products import router as products_router
-from security import router as security_router
-from users import router as users_router
-
-DEBUG = get_dotenv_config("DEBUG", "False").lower() == "true"
+from lists.routers.lists import router as lists_router
+from products.routers.products import router as products_router
+from shared.list_products.routers.list_products import router as list_products_router
+from shared.list_shares.routers.list_shares import router as list_shares_router
+from users.routers.users import router as users_router
 
 
 @asynccontextmanager
@@ -19,12 +18,16 @@ async def lifespan(app: FastAPI):
     yield
 
 
-app = FastAPI(debug=DEBUG, lifespan=lifespan)
+app = FastAPI(debug=Settings().DEBUG, lifespan=lifespan)
 
-app.include_router(router=lists_router)
-app.include_router(router=products_router)
-app.include_router(router=users_router)
-app.include_router(router=security_router)
+v1 = FastAPI()
+v1.include_router(router=lists_router)
+v1.include_router(router=list_products_router)
+v1.include_router(router=list_shares_router)
+v1.include_router(router=products_router)
+v1.include_router(router=users_router)
+
+app.mount("/v1", v1)
 
 
 def main():
