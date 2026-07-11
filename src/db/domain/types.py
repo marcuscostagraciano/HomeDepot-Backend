@@ -16,3 +16,7 @@ RecordIdT = TypeVar(
     "RecordIdT",
     contravariant=True,
 )
+CreatorIdT = TypeVar(
+    "CreatorIdT",
+    contravariant=True,
+)

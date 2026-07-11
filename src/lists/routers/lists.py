@@ -3,6 +3,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends
 
 from core.presentation.dependencies import RequestContext, get_request_context
+from shared.list_shares.repositories.list_share_repository import ListShareRepository
 
 from ..domain.filters import ListFilters
 from ..domain.schemas import ListCreate
@@ -38,7 +39,7 @@ async def read_lists(
     context: RequestContext = Depends(get_request_context),
 ) -> list[Response]:
     repository = ListRepository(context.session)
-    lists = await read_lists_case(repository, filters)
+    lists = await read_lists_case(repository, filters, context.user.id)
 
     return [Response.from_dict(obj.to_dict()) for obj in lists]
 
@@ -49,9 +50,15 @@ async def read_list(
     context: RequestContext = Depends(get_request_context),
 ) -> Response:
     repository = ListRepository(context.session)
-    list = await read_list_case(repository, list_id)
+    share_repository = ListShareRepository(context.session)
+    list_obj = await read_list_case(
+        repository,
+        share_repository,
+        list_id,
+        context.user.id,
+    )
 
-    return Response.from_dict(list.to_dict())
+    return Response.from_dict(list_obj.to_dict())
 
 
 @router.delete("/{list_id}", response_model=Response)
@@ -59,10 +66,13 @@ async def delete_list(
     list_id: UUID,
     context: RequestContext = Depends(get_request_context),
 ):
-    list = await delete_list_case(
-        ListRepository(context.session),
+    repository = ListRepository(context.session)
+    share_repository = ListShareRepository(context.session)
+    deleted = await delete_list_case(
+        repository,
+        share_repository,
         list_id,
         context.user.id,
     )
 
-    return Response.from_dict(list.to_dict())
+    return Response.from_dict(deleted.to_dict())

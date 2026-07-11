@@ -1,22 +1,19 @@
-from typing import Protocol, Tuple
+from typing import Protocol
 from uuid import UUID
 
 from db.domain.ports import RepositoryPort
 
+from ...domain.types import AssociationIdVO
 from .schemas import ListProductCreate, ListProductRead, ListProductUpdate
 
 
 class ListProductRepositoryPort(
-    RepositoryPort[
-        ListProductCreate,
-        ListProductRead,
-        Tuple[UUID, UUID],
-    ],
+    RepositoryPort[ListProductCreate, ListProductRead, AssociationIdVO, None],
     Protocol,
 ):
     async def read(
         self,
-        id: Tuple[UUID, UUID],
+        id: AssociationIdVO,
     ) -> ListProductRead | None: ...
 
     async def read_all_by_list(
@@ -26,11 +23,11 @@ class ListProductRepositoryPort(
 
     async def update(
         self,
-        id: Tuple[UUID, UUID],
+        id: AssociationIdVO,
         payload: ListProductUpdate,
     ) -> ListProductRead | None: ...
 
     async def delete(
         self,
-        id: Tuple[UUID, UUID],
+        id: AssociationIdVO,
     ) -> ListProductRead | None: ...

@@ -1,31 +1,15 @@
-from uuid import UUID
-
 from pydantic import Field
 
-from core.presentation.base_presentation import BasePresentation
-from core.presentation.requests import BaseRequestPresentation
 from core.presentation.responses import BaseResponsePresentation
 
 
-class Product(BasePresentation):
+class ProductReadResponsePresentation(BaseResponsePresentation):
     name: str
-    observation: str | None = Field(
+    brand: str | None = Field(
         default=None,
-        description="Observation about the Product",
+        description="Brand of the product",
     )
-
-
-class ProductCreate(Product, BaseRequestPresentation): ...
-
-
-class ProductReadResponsePresentation(ProductCreate, BaseResponsePresentation):
-    created_by_id: UUID = Field(
-        description="User id who created the Product",
-    )
-    updated_by_id: UUID | None = Field(
+    description: str | None = Field(
         default=None,
-        description="User id who last updated the Product",
+        description="Description of the product",
     )
-
-
-class ProductUpdate(Product, BasePresentation): ...

@@ -7,7 +7,8 @@ from core.config import Settings
 from db.db import create_db_and_tables
 from lists.routers.lists import router as lists_router
 from products.routers.products import router as products_router
-from shared.associations.routers.list_products import router as list_products_router
+from shared.list_products.routers.list_products import router as list_products_router
+from shared.list_shares.routers.list_shares import router as list_shares_router
 from users.routers.users import router as users_router
 
 
@@ -22,6 +23,7 @@ app = FastAPI(debug=Settings().DEBUG, lifespan=lifespan)
 v1 = FastAPI()
 v1.include_router(router=lists_router)
 v1.include_router(router=list_products_router)
+v1.include_router(router=list_shares_router)
 v1.include_router(router=products_router)
 v1.include_router(router=users_router)
 

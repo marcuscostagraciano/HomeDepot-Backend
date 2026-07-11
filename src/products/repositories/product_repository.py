@@ -11,7 +11,7 @@ from db.adapters.types import SortFieldMapping
 
 from ..domain.filters import ProductFilters
 from ..domain.ports import ProductRepositoryPort
-from ..domain.schemas import Product, ProductCreate
+from ..domain.schemas import ProductCreate, ProductRead
 from ..models.product import Product as ProductModel
 
 type Query = Select[Tuple[ProductModel]]
@@ -20,8 +20,9 @@ type Query = Select[Tuple[ProductModel]]
 class ProductRepository(
     SQLAlchemyRepository[
         ProductCreate,
-        Product,
+        ProductRead,
         ProductModel,
+        UUID,
         UUID,
     ],
     ProductRepositoryPort,
@@ -33,9 +34,9 @@ class ProductRepository(
     }
 
     def __init__(self, session: AsyncSession) -> None:
-        super().__init__(session=session, model=Product, orm_model=ProductModel)
+        super().__init__(session=session, model=ProductRead, orm_model=ProductModel)
 
-    async def read_all(self, filters: ProductFilters) -> list[Product]:
+    async def read_all(self, filters: ProductFilters) -> list[ProductRead]:
         query: Query = select(ProductModel)
 
         query = self._apply_filters(query, filters)
@@ -54,19 +55,13 @@ class ProductRepository(
         if filters.brand:
             conditions.append(ProductModel.brand == filters.brand)
 
-        if filters.min_price is not None:
-            conditions.append(ProductModel.price >= filters.min_price)
-
-        if filters.max_price is not None:
-            conditions.append(ProductModel.price <= filters.max_price)
-
         if conditions:
             query = query.where(and_(*conditions))
 
         return query
 
-    def _to_orm(self, entity: Product) -> ProductModel:
+    def _to_orm(self, entity: ProductCreate) -> ProductModel:
         return ProductModel(**entity.to_dict())
 
-    def _to_entity(self, model: ProductModel) -> Product:
-        return Product.from_dict(model.to_dict())
+    def _to_entity(self, model: ProductModel) -> ProductRead:
+        return ProductRead.from_dict(model.to_dict())

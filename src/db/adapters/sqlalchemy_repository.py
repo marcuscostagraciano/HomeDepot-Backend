@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.domain.enums import SortFieldEnum, SortOrderEnum
 
-from ..domain.types import DomainCreateSchemaT, DomainSchemaT, RecordIdT
+from ..domain.types import CreatorIdT, DomainCreateSchemaT, DomainSchemaT, RecordIdT
 from .types import ORMModelT, SortFieldMapping
 
 
@@ -17,6 +17,7 @@ class SQLAlchemyRepository(
         DomainSchemaT,
         ORMModelT,
         RecordIdT,
+        CreatorIdT,
     ],
 ):
     SORT_FIELDS: SortFieldMapping = {}
@@ -58,7 +59,11 @@ class SQLAlchemyRepository(
     async def create(
         self,
         payload: DomainCreateSchemaT,
+        creator_id: CreatorIdT | None = None,
     ) -> DomainSchemaT:
+        if creator_id is not None:
+            payload = payload.copy(update={"created_by_id": creator_id})
+
         orm = self._to_orm(payload)
 
         self.session.add(orm)

@@ -1,9 +1,11 @@
 from typing import Protocol
 
-from .types import DomainCreateSchemaT, DomainSchemaT, RecordIdT
+from .types import CreatorIdT, DomainCreateSchemaT, DomainSchemaT, RecordIdT
 
 
-class RepositoryPort(Protocol[DomainCreateSchemaT, DomainSchemaT, RecordIdT]):
+class RepositoryPort(
+    Protocol[DomainCreateSchemaT, DomainSchemaT, RecordIdT, CreatorIdT]
+):
     """Repository protocol for managing record persistence.
 
     Defines the interface for CRUD operations on records with generic types
@@ -18,6 +20,7 @@ class RepositoryPort(Protocol[DomainCreateSchemaT, DomainSchemaT, RecordIdT]):
     async def create(
         self,
         payload: DomainCreateSchemaT,
+        creator_id: CreatorIdT | None = None,
     ) -> DomainSchemaT: ...
     async def read(
         self,

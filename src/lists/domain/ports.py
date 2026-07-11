@@ -12,9 +12,16 @@ class ListRepositoryPort(
         ListCreate,
         ListRead,
         UUID,
+        UUID,
     ],
     Protocol,
 ):
     """Repository protocol for managing list persistence."""
 
     async def read_all(self, filters: ListFilters) -> list[ListRead]: ...
+
+    async def read_all_accessible(
+        self,
+        filters: ListFilters,
+        user_id: UUID,
+    ) -> list[ListRead]: ...

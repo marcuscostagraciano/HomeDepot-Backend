@@ -18,6 +18,7 @@ class UserRepository(
         UserRead,
         UserModel,
         UUID,
+        None,
     ],
     UserRepositoryPort,
 ):

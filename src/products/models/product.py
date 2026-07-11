@@ -7,4 +7,3 @@ class Product(AuditableModel):
     name: Mapped[str]
     brand: Mapped[str | None]
     description: Mapped[str | None]
-    price: Mapped[float | None]

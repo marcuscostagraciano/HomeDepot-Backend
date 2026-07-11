@@ -1,7 +1,8 @@
 from .ports import RepositoryPort
-from .types import DomainCreateSchemaT, DomainSchemaT, RecordIdT
+from .types import CreatorIdT, DomainCreateSchemaT, DomainSchemaT, RecordIdT
 
 __all__ = [
+    "CreatorIdT",
     "DomainCreateSchemaT",
     "DomainSchemaT",
     "RecordIdT",

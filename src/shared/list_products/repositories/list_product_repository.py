@@ -1,4 +1,3 @@
-from typing import Tuple
 from uuid import UUID
 
 from sqlalchemy import select
@@ -6,6 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from db.adapters.sqlalchemy_repository import SQLAlchemyRepository
 
+from ...domain.types import AssociationIdVO
 from ..domain.ports import ListProductRepositoryPort
 from ..domain.schemas import ListProductCreate, ListProductRead, ListProductUpdate
 from ..models.list_product import ListProduct as ListProductModel
@@ -16,7 +16,8 @@ class ListProductRepository(
         ListProductCreate,
         ListProductRead,
         ListProductModel,
-        Tuple[UUID, UUID],
+        AssociationIdVO,
+        None,
     ],
     ListProductRepositoryPort,
 ):
@@ -27,21 +28,10 @@ class ListProductRepository(
 
     async def read(
         self,
-        id: Tuple[UUID, UUID],
+        id: AssociationIdVO,
     ) -> ListProductRead | None:
-        list_id, product_id = id
-        query = select(ListProductModel).where(
-            ListProductModel.list_id == list_id,
-            ListProductModel.product_id == product_id,
-        )
-
-        result = await self.session.execute(query)
-        orm = result.scalar_one_or_none()
-
-        if orm is None:
-            return None
-
-        return self._to_entity(orm)
+        orm = await self._find_association(id)
+        return self._to_entity(orm) if orm else None
 
     async def read_all_by_list(self, list_id: UUID) -> list[ListProductRead]:
         query = select(ListProductModel).where(ListProductModel.list_id == list_id)
@@ -59,18 +49,10 @@ class ListProductRepository(
 
     async def update(
         self,
-        id: Tuple[UUID, UUID],
+        id: AssociationIdVO,
         payload: ListProductUpdate,
     ) -> ListProductRead | None:
-        list_id, product_id = id
-        query = select(ListProductModel).where(
-            ListProductModel.list_id == list_id,
-            ListProductModel.product_id == product_id,
-        )
-
-        result = await self.session.execute(query)
-        orm = result.scalar_one_or_none()
-
+        orm = await self._find_association(id)
         if orm is None:
             return None
 
@@ -86,16 +68,8 @@ class ListProductRepository(
 
         return self._to_entity(orm)
 
-    async def delete(self, id: Tuple[UUID, UUID]) -> ListProductRead | None:
-        list_id, product_id = id
-        query = select(ListProductModel).where(
-            ListProductModel.list_id == list_id,
-            ListProductModel.product_id == product_id,
-        )
-
-        result = await self.session.execute(query)
-        orm = result.scalar_one_or_none()
-
+    async def delete(self, id: AssociationIdVO) -> ListProductRead | None:
+        orm = await self._find_association(id)
         if orm is None:
             return None
 
@@ -103,6 +77,21 @@ class ListProductRepository(
         await self.session.commit()
 
         return self._to_entity(orm)
+
+    def _build_association_query(self, id: AssociationIdVO):
+        list_id, product_id = id
+
+        return select(ListProductModel).where(
+            ListProductModel.list_id == list_id,
+            ListProductModel.product_id == product_id,
+        )
+
+    async def _find_association(
+        self,
+        id: AssociationIdVO,
+    ) -> ListProductModel | None:
+        result = await self.session.execute(self._build_association_query(id))
+        return result.scalar_one_or_none()
 
     def _to_orm(self, entity: ListProductCreate) -> ListProductModel:
         return ListProductModel(**entity.to_dict())

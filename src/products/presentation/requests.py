@@ -5,7 +5,11 @@ from core.presentation.requests import BaseRequestPresentation
 
 class ProductCreateRequestPresentation(BaseRequestPresentation):
     name: str
-    observation: str | None = Field(
+    brand: str | None = Field(
         default=None,
-        description="Observation about the list",
+        description="Brand of the product",
+    )
+    description: str | None = Field(
+        default=None,
+        description="Description of the product",
     )

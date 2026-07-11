@@ -1,13 +1,14 @@
 from typing import Tuple
 from uuid import UUID
 
-from sqlalchemy import Select, and_, select
+from sqlalchemy import Select, and_, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.sql.elements import BinaryExpression, ColumnElement
 
 from core.domain.enums import SortFieldEnum
 from db.adapters.sqlalchemy_repository import SQLAlchemyRepository
 from db.adapters.types import SortFieldMapping
+from shared.list_shares.models.list_share import ListShare as ListShareModel
 
 from ..domain.filters import ListFilters
 from ..domain.ports import ListRepositoryPort
@@ -22,6 +23,7 @@ class ListRepository(
         ListCreate,
         ListRead,
         ListModel,
+        UUID,
         UUID,
     ],
     ListRepositoryPort,
@@ -52,6 +54,30 @@ class ListRepository(
         filters: ListFilters,
     ) -> list[List]:
         query: Query = select(ListModel)
+
+        query = self._apply_filters(query, filters)
+        query = self._apply_sort(query, filters.sort, filters.order)
+        query = self._apply_pagination(query, filters.page, filters.limit)
+
+        return await self._execute(query)
+
+    async def read_all_accessible(
+        self,
+        filters: ListFilters,
+        user_id: UUID,
+    ) -> list[List]:
+        query: Query = select(ListModel)
+
+        accessible_ids = select(ListShareModel.list_id).where(
+            ListShareModel.user_id == user_id
+        )
+
+        query = query.where(
+            or_(
+                ListModel.created_by_id == user_id,
+                ListModel.id.in_(accessible_ids),
+            )
+        )
 
         query = self._apply_filters(query, filters)
         query = self._apply_sort(query, filters.sort, filters.order)

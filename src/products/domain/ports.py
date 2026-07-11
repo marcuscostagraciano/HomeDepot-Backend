@@ -12,6 +12,7 @@ class ProductRepositoryPort(
         ProductCreate,
         Product,
         UUID,
+        UUID,
     ],
     Protocol,
 ):

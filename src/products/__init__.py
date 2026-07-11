@@ -10,6 +10,6 @@ Exports:
         - PUT /products/{product_id} - Update an existing product
         - DELETE /products/{product_id} - Delete a product
 
-        Supports filtering by brand, price range, and full-text search.
+        Supports filtering by brand and full-text search.
         Prefix: /products | Tags: ['products']
 """

@@ -1,10 +1,6 @@
 from uuid import UUID
 
-from core.domain.errors import (
-    NotFoundError,
-    NotNegativeNumberError,
-    RequiredFieldMissingError,
-)
+from core.domain.errors import NotFoundError, RequiredFieldMissingError
 
 from ..domain.filters import ProductFilters
 from ..domain.ports import ProductRepositoryPort
@@ -14,15 +10,12 @@ from ..domain.schemas import Product, ProductCreate
 async def create_product(
     repository: ProductRepositoryPort,
     product: ProductCreate,
-    user_id: UUID,
+    creator_id: UUID,
 ) -> Product:
     if not product.name:
         raise RequiredFieldMissingError("name")
 
-    if product.price is not None and product.price < 0:
-        raise NotNegativeNumberError("price", product.price)
-
-    return await repository.create(product)
+    return await repository.create(product, creator_id=creator_id)
 
 
 async def read_product(
