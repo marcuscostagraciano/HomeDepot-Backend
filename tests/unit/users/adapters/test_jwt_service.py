@@ -1,8 +1,8 @@
 from typing import Any, Dict
 
-from security.adapters import JWTService, get_jwt_service
-from security.domain import JWTServicePort
-from security.schemas import TokenSchema
+from users.adapters.jwt_service import JWTService, get_jwt_service
+from users.domain.ports import JWTServicePort
+from users.domain.schemas import TokenSchema
 
 
 def test_generate_returns_token_schema(

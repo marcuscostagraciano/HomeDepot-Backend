@@ -4,13 +4,13 @@ from uuid import UUID
 
 import pytest
 
-from security.domain import AuthRepositoryPort, JWTServicePort
-from users.schemas import UserRead
+from users.domain.ports import AuthenticatorPort, JWTServicePort
+from users.domain.schemas import UserRead
 
 
 @pytest.fixture
-def auth_repository() -> AuthRepositoryPort:
-    return AsyncMock(spec=AuthRepositoryPort)
+def authenticator() -> AuthenticatorPort:
+    return AsyncMock(spec=AuthenticatorPort)
 
 
 @pytest.fixture
@@ -27,4 +27,5 @@ def user() -> UserRead:
         first_name="Test",
         last_name="test",
         email="test@example.test",
+        password="hashed-password",
     )

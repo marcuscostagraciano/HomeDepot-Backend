@@ -1,5 +1,5 @@
-from security.adapters import PasswordHasher, get_password_hasher
-from security.domain import PasswordHasherPort
+from users.adapters.password_hasher import PasswordHasher, get_password_hasher
+from users.domain.ports import PasswordHasherPort
 
 
 def test_hash_does_not_return_plain_password(

@@ -2,9 +2,10 @@ from typing import Any, Dict
 
 import pytest
 
-from security.adapters import JWTService, PasswordHasher
-from security.domain import JWTServicePort, PasswordHasherPort
 from tests.config import Settings
+from users.adapters.jwt_service import JWTService
+from users.adapters.password_hasher import PasswordHasher
+from users.domain.ports import JWTServicePort, PasswordHasherPort
 
 
 @pytest.fixture

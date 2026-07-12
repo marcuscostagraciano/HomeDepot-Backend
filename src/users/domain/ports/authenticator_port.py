@@ -1,6 +1,6 @@
 from typing import Any, Dict, Protocol
 
-from ..schemas import UserRead
+from ..schemas import TokenSchema, UserRead
 
 
 class AuthenticatorPort(Protocol):
