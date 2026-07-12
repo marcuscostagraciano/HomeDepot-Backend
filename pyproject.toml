@@ -11,18 +11,41 @@ dependencies = [
     "pwdlib[argon2]",
     "pydantic[email]>=2.12.5",
     "pyjwt",
-    "python-dotenv>=1.2.2",
     "tzdata>=2026.2",
     "uvicorn>=0.41.0",
 ]
-
-[tool.uv]
-package = true
 
 [dependency-groups]
 dev = [
     "pylance>=7.0.0",
 ]
+test = [
+    "pytest>=9.1.1",
+    "pytest-asyncio>=1.4.0",
+    "pytest-cov>=7.1.0",
+    "httpx>=0.28.1",
+]
+
+
+[tool.uv]
+package = true
 
 [project.scripts]
 serve = "main:main"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = [
+    "-ra",
+    "--cov=src",
+    "--cov-report=term-missing",
+    "--cov-report=html:coverage",
+    "--cov-report=xml:coverage/coverage.xml",
+    "--cov-fail-under=90",
+]
+asyncio_mode = "auto"
+
+[tool.coverage.run]
+branch = true
+data_file = "coverage/.coverage"
+omit = ["*/__init__.py"]

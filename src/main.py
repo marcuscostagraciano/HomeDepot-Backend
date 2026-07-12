@@ -4,6 +4,7 @@ import uvicorn
 from fastapi import FastAPI
 
 from core.config import Settings
+from core.presentation.exception_handler import register_exception_handlers
 from db.db import create_db_and_tables
 from lists.routers.lists import router as lists_router
 from products.routers.products import router as products_router
@@ -21,6 +22,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(debug=Settings().DEBUG, lifespan=lifespan)
 
 v1 = FastAPI()
+register_exception_handlers(v1)
 v1.include_router(router=lists_router)
 v1.include_router(router=list_products_router)
 v1.include_router(router=list_shares_router)

@@ -1,48 +1,42 @@
-from fastapi import Depends
+from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
-from jwt.exceptions import DecodeError, ExpiredSignatureError
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from core.domain.errors import ExpiredTokenError, UnauthorizedError
+from db.db import get_async_session
+from users.adapters.jwt_service import get_jwt_service
+from users.domain.ports import JWTServicePort
+from users.domain.schemas import UserRead
+from users.repositories.user_repository import UserRepository
 
-from ..adapters.jwt_service import get_jwt_service
-from ..domain.ports import JWTServicePort, UserRepositoryPort
-from ..domain.schemas import UserRead
-from ..repositories.user_repository import get_user_repository
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/v1/users/login")
 
 
 async def get_current_user(
-    token: str = Depends(OAuth2PasswordBearer(tokenUrl="users/login")),
-    repository: UserRepositoryPort = Depends(get_user_repository),
+    token: str = Depends(oauth2_scheme),
+    session: AsyncSession = Depends(get_async_session),
     jwt_service: JWTServicePort = Depends(get_jwt_service),
-) -> UserRead | None:
-    """Get the current user based in the provided token.
-
-    Args:
-        token (str, optional): Token used to fetch the current user. Defaults to Depends(oauth2_scheme).
-        repository (UserRepositoryPort, optional): Repository responsible for the database fetch. Defaults to Depends(get_user_repository).
-
-    Raises:
-        UnauthorizedError: Error raised when any of these situations occur:
-            - It is not possible to `decode` the token;
-            - The token has expired;
-            - The `email` claim is missing.
-
-    Returns:
-        UserRead: User object with the current user informations.
-    """
-
+) -> UserRead:
     try:
         payload = jwt_service.decode(token)
-    except DecodeError:
-        raise UnauthorizedError()
-    except ExpiredSignatureError:
-        raise ExpiredTokenError()
+    except Exception:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid token",
+        )
 
-    if not (email := payload.get("email")):
-        raise UnauthorizedError()
+    email = payload.get("email")
+    if not email:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid token payload",
+        )
 
-    user: UserRead | None = await repository.get_user_by_email(email)
+    repository = UserRepository(session)
+    user = await repository.get_user_by_email(email)
     if not user:
-        raise UnauthorizedError()
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User not found",
+        )
 
     return user
